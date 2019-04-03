@@ -48,46 +48,29 @@ def model_fn(mode, features, labels):
     lstm_inputs = tf.concat([word_inputs, cnn_output], axis=-1)
     
     # LSTM
-    #with tf.variable_scope('lstm_1'):
-    #    cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
-    #    lstm_inputs, _ = tf.nn.dynamic_rnn(cell, lstm_inputs, dtype=tf.float32)
-    
-    #with tf.variable_scope('lstm_2'):
     fw_cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
     bw_cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
     (fw_outputs, bw_outputs), (fw_state, bw_state) = tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell, lstm_inputs, dtype=tf.float32)
     
+    # Attention
     W = tf.Variable(tf.random_normal([cfg.lstm_units], stddev=0.1))
     H = fw_outputs + bw_outputs
     M = tf.tanh(H)
-    
-    #alpha = tf.nn.softmax(tf.reshape(tf.matmul(tf.reshape(M, [-1, cfg.lstm_units]), tf.reshape(W, [-1, 1])), (-1, cfg.word_max_len)))
     alpha = tf.nn.softmax(tf.reshape(tf.matmul(tf.reshape(M, [-1, cfg.lstm_units]), tf.reshape(W, [-1, 1])), (-1, tf.shape(word_inputs)[1])))
     r = tf.matmul(tf.transpose(H, [0, 2, 1]), tf.reshape(alpha, [-1, tf.shape(word_inputs)[1], 1]))
     r = tf.squeeze(r)
-
     h_star = tf.tanh(r)
     h_drop = tf.nn.dropout(h_star, .5)
     
-    #c_output = tf.concat([bw_state.c, fw_state.c], axis=-1)
-    #h_output = tf.concat([bw_state.h, fw_state.h], axis=-1)
-    #output = tf.contrib.rnn.LSTMStateTuple(c=c_output, h=h_output)
-    
-    #output = tf.concat([bw_state.c, bw_state.h, fw_state.c, fw_state.h], axis=-1)
-    #lstm_output = tf.layers.dropout(output, rate=.5, training=training)
-
     # Dense
     FC_W = tf.Variable(tf.truncated_normal([cfg.lstm_units, 2], stddev=0.1))
     FC_b = tf.Variable(tf.constant(0., shape=[2]))
     logits = tf.nn.xw_plus_b(h_drop, FC_W, FC_b)
     
-    #output = tf.layers.dense(h_drop, 128)
-    #output = tf.layers.dropout(output, rate=.5, training=training)
-    #logits = tf.layers.dense(output, 2)
-    
     # Loss
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
     
+    # Dropout
     #optimizer = tf.train.AdamOptimizer(1e-4)
     #gradients, variables = zip(*optimizer.compute_gradients(loss))
     #gradients, _ = tf.clip_by_global_norm(gradients, .1)
@@ -145,6 +128,7 @@ def train():
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_func, throttle_secs=30)
     
     tf.estimator.train_and_evaluate(est, train_spec, eval_spec)
+
 
 if __name__ == '__main__':
     train()
