@@ -12,7 +12,9 @@ from tf_metrics import precision, recall, f1
 
 tf.enable_eager_execution()
 
+# This module preprocesses and loads the data and emotion features
 data_loader = DataLoader()
+
 
 def model_fn(mode, features, labels):
     # Logging
@@ -46,15 +48,10 @@ def model_fn(mode, features, labels):
     cnn_output = tf.reshape(cnn_output, [-1, tf.shape(char_inputs)[1], 128 * int(cfg.word_max_len / 4)])
     word_inputs = tf.layers.dropout(word_inputs, rate=.5, training=training)
     lstm_inputs = tf.concat([word_inputs, cnn_output], axis=-1)
-    
+   
     # LSTM
-    #with tf.variable_scope('lstm_1'):
-    #    cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
-    #    lstm_inputs, _ = tf.nn.dynamic_rnn(cell, lstm_inputs, dtype=tf.float32)
-    
-    with tf.variable_scope('lstm_2'):
-        cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
-        _, final_state = tf.nn.dynamic_rnn(cell, lstm_inputs, dtype=tf.float32)
+    cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
+    _, final_state = tf.nn.dynamic_rnn(cell, lstm_inputs, dtype=tf.float32)
     
     lstm_output = tf.concat(final_state, axis=-1)
     lstm_output = tf.concat([lstm_output, emo_features], axis=-1)
@@ -120,6 +117,7 @@ def train():
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_func, throttle_secs=30)
     
     tf.estimator.train_and_evaluate(est, train_spec, eval_spec)
+
 
 if __name__ == '__main__':
     train()
