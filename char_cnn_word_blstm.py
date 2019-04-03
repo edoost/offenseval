@@ -12,7 +12,9 @@ from tf_metrics import precision, recall, f1
 
 tf.enable_eager_execution()
 
+# This module preprocesses and loads the data
 data_loader = DataLoader()
+
 
 def model_fn(mode, features, labels):
     # Logging
@@ -46,21 +48,12 @@ def model_fn(mode, features, labels):
     cnn_output = tf.reshape(cnn_output, [-1, tf.shape(char_inputs)[1], 128 * int(cfg.word_max_len / 4)])
     word_inputs = tf.layers.dropout(word_inputs, rate=.5, training=training)
     lstm_inputs = tf.concat([word_inputs, cnn_output], axis=-1)
-    
+     
     # LSTM
-    #with tf.variable_scope('lstm_1'):
-    #    cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
-    #    lstm_inputs, _ = tf.nn.dynamic_rnn(cell, lstm_inputs, dtype=tf.float32)
-    
-    #with tf.variable_scope('lstm_2'):
     fw_cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
     bw_cell = tf.contrib.rnn.LSTMCell(num_units=cfg.lstm_units)
     _, (fw_state, bw_state) = tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell, lstm_inputs, dtype=tf.float32)
-     
-    #c_output = tf.concat([bw_state.c, fw_state.c], axis=-1)
-    #h_output = tf.concat([bw_state.h, fw_state.h], axis=-1)
-    #output = tf.contrib.rnn.LSTMStateTuple(c=c_output, h=h_output)
-    
+      
     output = tf.concat([bw_state.c, bw_state.h, fw_state.c, fw_state.h], axis=-1)
     lstm_output = tf.layers.dropout(output, rate=.5, training=training)
 
@@ -72,10 +65,11 @@ def model_fn(mode, features, labels):
     # Loss
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
     
-    #optimizer = tf.train.AdamOptimizer(1e-4)
-    #gradients, variables = zip(*optimizer.compute_gradients(loss))
-    #gradients, _ = tf.clip_by_global_norm(gradients, .1)
-    #train_op = optimizer.apply_gradients(zip(gradients, variables), tf.train.get_global_step())  
+    # Gradient clipping
+    # optimizer = tf.train.AdamOptimizer(1e-4)
+    # gradients, variables = zip(*optimizer.compute_gradients(loss))
+    # gradients, _ = tf.clip_by_global_norm(gradients, .1)
+    # train_op = optimizer.apply_gradients(zip(gradients, variables), tf.train.get_global_step())  
     
     # Metrics
     indices = [0, 1]

@@ -64,10 +64,10 @@ def model_fn(mode, features, labels):
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
     
     # Gradient clipping
-    #optimizer = tf.train.AdamOptimizer(1e-4)
-    #gradients, variables = zip(*optimizer.compute_gradients(loss))
-    #gradients, _ = tf.clip_by_global_norm(gradients, .05)
-    #train_op = optimizer.apply_gradients(zip(gradients, variables), tf.train.get_global_step())  
+    # optimizer = tf.train.AdamOptimizer(1e-4)
+    # gradients, variables = zip(*optimizer.compute_gradients(loss))
+    # gradients, _ = tf.clip_by_global_norm(gradients, .05)
+    # train_op = optimizer.apply_gradients(zip(gradients, variables), tf.train.get_global_step())  
     
     # Metrics
     indices = [0, 1]

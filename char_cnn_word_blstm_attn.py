@@ -12,7 +12,9 @@ from tf_metrics import precision, recall, f1
 
 tf.enable_eager_execution()
 
+# This module preprocesses and loads the data
 data_loader = DataLoader()
+
 
 def model_fn(mode, features, labels):
     # Logging
@@ -70,11 +72,11 @@ def model_fn(mode, features, labels):
     # Loss
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
     
-    # Dropout
-    #optimizer = tf.train.AdamOptimizer(1e-4)
-    #gradients, variables = zip(*optimizer.compute_gradients(loss))
-    #gradients, _ = tf.clip_by_global_norm(gradients, .1)
-    #train_op = optimizer.apply_gradients(zip(gradients, variables), tf.train.get_global_step())  
+    # Gradient clipping
+    # optimizer = tf.train.AdamOptimizer(1e-4)
+    # gradients, variables = zip(*optimizer.compute_gradients(loss))
+    # gradients, _ = tf.clip_by_global_norm(gradients, .1)
+    # train_op = optimizer.apply_gradients(zip(gradients, variables), tf.train.get_global_step())  
     
     # Metrics
     indices = [0, 1]
