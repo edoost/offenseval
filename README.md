@@ -7,3 +7,9 @@
 - ```char_cnn_word_gru.py``` is exactly the same as ```char_cnn_word_blstm.py```, except that the RNN's cell is GRU.
 
 - ```char_cnn_word_lstm.py``` this one uses a unidirectional RNN with LSTM cells.
+
+- ```char_cnn_word_lstm_attn.py``` is the same as the above one, plus attention.
+
+- ```char_cnn_word_lstm_emotion.py``` also makes use of emotion dense features as the input to the FCN layer.
+
+- ```data_loader.py``` and ```data_loader_emotion_feature.py``` read the data from file, preprocess it, and convert it to the right format for first 5 and the last one, repectively.
