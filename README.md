@@ -1,6 +1,6 @@
 # Ghmerti at SemEval-2019 Task 6: A Deep Word- and Character-based Approach to Offensive Language Identification
 
-This is the code for ***Ghmerti at SemEval-2019 Task 6: A Deep Word- and Character-based Approach to Offensive Language Identification***, to be published in the Proceedings of The 13th International Workshop on Semantic Evaluation (SemEval 2019).
+This is the code for [***Ghmerti at SemEval-2019 Task 6: A Deep Word- and Character-based Approach to Offensive Language Identification***](https://www.aclweb.org/anthology/S19-2110/), published in the Proceedings of The 13th International Workshop on Semantic Evaluation (SemEval 2019).
 
 - ```char_cnn_word_blstm.py``` is a CNN with character embeddings as input and a bidirectional RNN with LSTM cells and word embeddings as input features.
 
