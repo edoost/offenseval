@@ -119,12 +119,14 @@ class DataLoader:
                 embedded_tweet.append(self.word_embedding_model[word.lower()])
             except KeyError:
                 embedded_tweet.append([0 for _ in range(cfg.word_embed_dim)])
+                
         return np.array(embedded_tweet)
    
 
     def _pad(self, word):
         for _ in range(cfg.word_max_len - len(word)):
             word.append(0)
+            
         return word
 
 
@@ -159,7 +161,6 @@ class DataLoader:
             indexed_tweet = self._tweet_to_indices(preprocessed_tweet)
             
             embedded_tweet = self._tweet_to_embeddings(preprocessed_tweet)
-
             
             yield (embedded_tweet, indexed_tweet), indexed_a_tag
 
@@ -177,6 +178,7 @@ class DataLoader:
 
         for tweet, a_tag in zip(encoded_comments, a_tags):
             indexed_a_tag = self._tags_to_one_hot(a_tag, 'a')
+            
             yield tweet, indexed_a_tag
 
 
