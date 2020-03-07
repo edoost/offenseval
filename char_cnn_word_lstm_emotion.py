@@ -1,13 +1,15 @@
 import os
 import sys
 import logging
+from pathlib import Path
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import layers
-from data_loader_emotion_feature import DataLoader
-from common import config as cfg
-from pathlib import Path
 from tf_metrics import precision, recall, f1
+
+from data_loader import DataLoader
+from common import config as cfg
 
 
 tf.enable_eager_execution()
