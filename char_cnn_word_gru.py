@@ -16,6 +16,7 @@ tf.enable_eager_execution()
 
 data_loader = DataLoader()
 
+
 def model_fn(mode, features, labels):
     # Logging
     Path('results').mkdir(exist_ok=True)
@@ -119,5 +120,6 @@ def train():
     
     tf.estimator.train_and_evaluate(est, train_spec, eval_spec)
 
+    
 if __name__ == '__main__':
     train()
