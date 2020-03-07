@@ -1,14 +1,15 @@
+import re
 import pickle
-import numpy as np
-from common import config as cfg
 from collections import Counter
-#from pyfasttext import FastText
+# import functools
+# import operator
+
+import emoji
+import numpy as np
 from gensim.models import KeyedVectors
 from nltk.tokenize import TweetTokenizer
-#import functools
-#import operator
-import re
-import emoji
+
+from common import config as cfg
 
 
 class DataLoader:
@@ -64,7 +65,6 @@ class DataLoader:
                 pickle.dump(self.char_to_index, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
         self.a_tag_to_index = {'NOT': 0, 'OFF': 1}
-
     
     def _data_reader(self, file_path):
         tweets, a_tags, b_tags, c_tags = [], [], [], []
@@ -84,31 +84,28 @@ class DataLoader:
 
         return tweets, a_tags, b_tags, c_tags
     
-    
     def _preprocessor(self, tweet):
         for distorted_black_word in self.distorted_black_words_dict:
             tweet = tweet.replace(distorted_black_word, self.distorted_black_words_dict[distorted_black_word])
         
-        #for word in self.abbr_dict:
-        #    tweet = re.sub(' ' + word.lower() + ' ', self.abbr_dict.get(word.lower()), tweet)
+        # for word in self.abbr_dict:
+        #     tweet = re.sub(' ' + word.lower() + ' ', self.abbr_dict.get(word.lower()), tweet)
 
-        #for word in self.contractions_dict:
-        #    tweet = re.sub(word, self.contractions_dict[word], tweet)
+        # for word in self.contractions_dict:
+        #     tweet = re.sub(word, self.contractions_dict[word], tweet)
         
-        #tweet = tweet.replace('@user', '').replace('@USER', '')
+        # tweet = tweet.replace('@user', '').replace('@USER', '')
         tweet = re.sub(r' +', ' ', tweet)
 
         return tweet.strip().replace('&amp;', 'and')
 
-
-    #def tokenizer(self, tweet):
-    #    split_emoji = emoji.get_emoji_regexp().split(tweet)
-    #    split_whitespace = [re.findall(r"[\w'@$/*]+|[.,!?;\"%()]", substr) if substr not in emoji.UNICODE_EMOJI else substr for substr in split_emoji] 
-    #    tokenized_tweet = functools.reduce(operator.concat, [[x] if type(x) is str else x for x in split_whitespace])
+    # def tokenizer(self, tweet):
+    #     split_emoji = emoji.get_emoji_regexp().split(tweet)
+    #     split_whitespace = [re.findall(r"[\w'@$/*]+|[.,!?;\"%()]", substr) if substr not in emoji.UNICODE_EMOJI else substr for substr in split_emoji] 
+    #     tokenized_tweet = functools.reduce(operator.concat, [[x] if type(x) is str else x for x in split_whitespace])
     #
-    #    return tokenized_tweet
+    #     return tokenized_tweet
     
-
     def _tweet_to_embeddings(self, tweet):
         embedded_tweet = []
         for word in self.tokenizer.tokenize(tweet):
@@ -118,12 +115,10 @@ class DataLoader:
                 embedded_tweet.append([0 for _ in range(cfg.word_embed_dim)])
         return np.array(embedded_tweet)
    
-
     def _pad(self, word):
         for _ in range(cfg.word_max_len - len(word)):
             word.append(0)
         return word
-
 
     def _tweet_to_indices(self, tweet):
         indexed_tweet = []
@@ -135,13 +130,11 @@ class DataLoader:
         
         return np.array(indexed_tweet)
 
-    
     def _tags_to_one_hot(self, tag, mode=None):
         if mode is 'a':
             return np.eye(2)[self.a_tag_to_index[tag]]
         elif mode is 'b':
             return np.eye(2)[self.b_tag_to_index[tag]]
-    
     
     def data_generator(self, mode=None):
         if mode is 'train':
@@ -165,7 +158,6 @@ class DataLoader:
             
             yield (embedded_tweet, indexed_tweet, emotion_feature), indexed_a_tag
 
-    
     def data_generator_pred(self):
         tweets, a_tags, b_tags, c_tags = self._data_reader(cfg.valid_data_dir)
 
@@ -176,4 +168,3 @@ class DataLoader:
             indexed_tweet = self._tweet_to_indices(preprocessed_tweet)
  
             yield embedded_tweet, indexed_tweet
-
