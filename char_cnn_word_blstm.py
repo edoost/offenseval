@@ -126,5 +126,6 @@ def train():
     
     tf.estimator.train_and_evaluate(est, train_spec, eval_spec)
 
+    
 if __name__ == '__main__':
     train()
