@@ -1,8 +1,8 @@
 import re
 import pickle
 from collections import Counter
-#import functools
-#import operator
+# import functools
+# import operator
 
 import emoji
 import numpy as np
@@ -91,23 +91,23 @@ class DataLoader:
         for distorted_black_word in self.distorted_black_words_dict:
             tweet = tweet.replace(distorted_black_word, self.distorted_black_words_dict[distorted_black_word])
         
-        #for word in self.abbr_dict:
-        #    tweet = re.sub(' ' + word.lower() + ' ', self.abbr_dict.get(word.lower()), tweet)
+        # for word in self.abbr_dict:
+        #     tweet = re.sub(' ' + word.lower() + ' ', self.abbr_dict.get(word.lower()), tweet)
 
-        #for word in self.contractions_dict:
-        #    tweet = re.sub(word, self.contractions_dict[word], tweet)
+        # for word in self.contractions_dict:
+        #     tweet = re.sub(word, self.contractions_dict[word], tweet)
         
-        #tweet = tweet.replace('@user', '').replace('@USER', '')
+        # tweet = tweet.replace('@user', '').replace('@USER', '')
         tweet = re.sub(r' +', ' ', tweet)
 
         return tweet.strip().replace('&amp;', 'and')
 
-    #def tokenizer(self, tweet):
-    #    split_emoji = emoji.get_emoji_regexp().split(tweet)
-    #    split_whitespace = [re.findall(r"[\w'@$/*]+|[.,!?;\"%()]", substr) if substr not in emoji.UNICODE_EMOJI else substr for substr in split_emoji] 
-    #    tokenized_tweet = functools.reduce(operator.concat, [[x] if type(x) is str else x for x in split_whitespace])
+    # def tokenizer(self, tweet):
+    #     split_emoji = emoji.get_emoji_regexp().split(tweet)
+    #     split_whitespace = [re.findall(r"[\w'@$/*]+|[.,!?;\"%()]", substr) if substr not in emoji.UNICODE_EMOJI else substr for substr in split_emoji] 
+    #     tokenized_tweet = functools.reduce(operator.concat, [[x] if type(x) is str else x for x in split_whitespace])
     #
-    #    return tokenized_tweet
+    #     return tokenized_tweet
     
     def _tweet_to_embeddings(self, tweet):
         embedded_tweet = []
